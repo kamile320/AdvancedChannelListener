@@ -1,3 +1,10 @@
 [ACL v1.0]
     Changelog:
 - Created Bot
+
+
+[ACL v2.0]
+    Changelog:
+- Bot saves every message to directories named as User ID who just send something
+- New command: .ACL [getusr/get history]
+- Updated printed date format in Logs.txt

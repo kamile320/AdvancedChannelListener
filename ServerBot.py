@@ -1,7 +1,7 @@
 import subprocess
 import os
 
-ver = "1.0"
+ver = "2.0"
 mainver = "1.7"
 
 def os_selector():
@@ -24,8 +24,6 @@ def os_selector():
     else:
         print('Failed to run Script. Aborting Install')
 
-def channelLog(usr, usrmsg, chnl, srv, usr_id, chnl_id, srv_id):
-    print(f"[Message//{srv}/{chnl}] {usr}: {usrmsg}")
 
 try:
     import discord
@@ -43,6 +41,48 @@ try:
 except Exception as exc:
     print(f"Error in importing Library's. Trying to install it and update pip3\nException: {exc}\n")
     os_selector()
+
+#AdvancedChannelListener
+def aclcheck():
+    if os.path.exists(f'{maindir}/ACL') == True:
+        print("ACL check OK")
+    else:
+        print("ACL not found.\nCreating...")
+        try:
+            os.makedirs(f'{maindir}/ACL')
+        except:
+            print('Cannot create ACL directory.')
+
+
+
+def userLog(usr, usrmsg, chnl, srv, usr_id, chnl_id, srv_id):
+    if os.path.exists(f'{maindir}/ACL/{usr_id}/message.txt') == True:
+        usrmessage = open(f'{maindir}/ACL/{usr_id}/message.txt', 'a')
+        usrmessage.write(f'[{srv}({srv_id}) / {chnl}({chnl_id})] {usr}({usr_id}): {usrmsg}\n')
+        usrmessage.close()
+    else:
+        print("[ACL] New user detected. Creating new entry...")
+        os.makedirs(f'{maindir}/ACL/{usr_id}')
+        usrmessage = open(f'{maindir}/ACL/{usr_id}/message.txt', 'a')
+        usrmessage.write(f'[{srv}({srv_id}) / {chnl}({chnl_id})] {usr}({usr_id}): {usrmsg}\n')
+        usrmessage.close()
+
+
+
+def channelLog(usr, usrmsg, chnl, srv, usr_id, chnl_id, srv_id):
+    print(f"[Message//{srv}/{chnl}] {usr}: {usrmsg}")
+    if os.path.exists(f'{maindir}/ACL/default/message.txt') == True:
+        usrmessage = open(f'{maindir}/ACL/default/message.txt', 'a')
+        usrmessage.write(f"[Message//{srv}/{chnl}] {usr}: {usrmsg}\n")
+        usrmessage.close()
+    else:
+        print("[ACL] Default message history not detected. Creating new entry...")
+        os.makedirs(f'{maindir}/ACL/default')
+        usrmessage = open(f'{maindir}/ACL/default/message.txt', 'a')
+        usrmessage.write(f"[Message//{srv}/{chnl}] {usr}: {usrmsg}\n")
+        usrmessage.close()
+
+
 
 
 #Baner
@@ -74,7 +114,7 @@ logs = open('Logs.txt', 'w')
 def createlogs():
     logs.write(f"""S E R V E R  B O T
 LOGS
-Time: {datetime.datetime.now()}
+Date: {datetime.datetime.now().strftime('%d-%m-%Y %H:%M:%S')}
 Info: Remember to shut down bot by .ShutDown command or log will be empty.
 =============================================================================\n\n""")
     logs.close()
@@ -97,41 +137,51 @@ sctlerr = "Something went wrong.\n'sctl' directory with service entries exists?"
 sctlmade = "Created 'sctl' directory for systemctl service entry."
 badsite = "Something went wrong.\nHave you typed the correct address?\n..Or maybe the website just doesn't exist? "
 
+ACLnotfounderr = "User history not found."
+ACLhistorynotfound = "Default message history does not exist."
+ACLnopermission = "You don't have permission to use ACL mode. This incident will be reported."
 
 #ClientEvent
 @client.event
 async def on_ready():
     print(f'Logged as {client.user}')
     print(f'Welcome in A.C.L. v{ver}')
-    print('Bot runtime: ', datetime.datetime.now())
+    aclcheck()
+    print('Bot runtime: ', datetime.datetime.now().strftime('%d-%m-%Y %H:%M:%S'))
     print('=' *40)
 
 #AdvancedChannelListener
 @client.event
 async def on_message(message):
+
+    #Username
     username = str(message.author).split('#')[0]
+    #UserMessage
     user_message = str(message.content)
-    #channel
+    #Channel
     try:
         channel = str(message.channel.name)
     except AttributeError:
         channel = str(message.channel)
-    #server
+    #Server
     try:
         server = str(message.guild.name)
     except AttributeError:
         server = str(message.guild)
-    
-    #ID
+    #UserID
     userid = message.author.id
+    #ChannelID
     channelid = message.channel.id
-    #server
+    #ServerID
     try:
         serverid = message.guild.id
     except AttributeError:
         serverid = "DM"
 
+
     channelLog(username, user_message, channel, server, userid, channelid, serverid)
+    userLog(username, user_message, channel, server, userid, channelid, serverid)
+
     await client.process_commands(message)
 
 
@@ -202,7 +252,9 @@ async def newest_update(ctx):
     await ctx.send(f"""
 [ACL v{ver}]
     Changelog:
-- Created Bot
+- Bot saves every message to directories named as User ID who just send something
+- New command: .ACL [getusr/get history]
+- Updated printed date format in Logs.txt
 
 To see older releases, find 'updates.txt' in folder 'Files'
 """)
@@ -464,6 +516,32 @@ async def pingip(ctx, ip):
         await ctx.send(not_allowed)
         #AdminOnly-END
 
+
+
+        #ACL
+#1
+@client.command(name='ACL', help='Manage A.C.L. users messages saved history\ngetusr - shows User history by User ID\nget history - history of all saved messages')
+async def ACL(ctx, mode, *, value):
+    if str(ctx.message.author.id) in admin_usr:
+        if mode == 'getusr':
+            try:
+                await ctx.send(file=discord.File(f'{maindir}/ACL/{value}/message.txt'))
+            except:
+                await ctx.send(ACLnotfounderr)
+        elif mode == 'get' and value == 'history':
+            try:
+                await ctx.send(file=discord.File(f'{maindir}/ACL/default/message.txt'))
+            except:
+                await ctx.send(ACLhistorynotfound)
+        else:
+            await ctx.send('Wrong mode.')
+    else:
+        await ctx.send(ACLnopermission)
+        print(f"Information[ACL]: User {ctx.message.author.id} tried to use !ACL command without permission.\nSee {maindir}/ACL/{ctx.message.author.id} for more information.\n")
+        logs = open(f'{maindir}/Logs.txt', 'a')
+        logs.write(f"Information[ACL]: User {ctx.message.author.id} tried to use !ACL command without permission.\nSee {maindir}/ACL/{ctx.message.author.id} for more information.\n")
+        logs.close()
+        #ACL-END
 
 
         #ModeratorOnly
