@@ -8,3 +8,9 @@
 - Bot saves every message to directories named as User ID who just send something
 - New command: .ACL [getusr/get history]
 - Updated printed date format in Logs.txt
+
+
+[ACL v2.1]
+    Changelog:
+- Fixed an encoding issue that caused an error on Windows systems.
+- changed default prefix to .

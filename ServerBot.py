@@ -1,7 +1,7 @@
 import subprocess
 import os
 
-ver = "2.0"
+ver = "2.1"
 mainver = "1.7"
 
 def os_selector():
@@ -57,13 +57,13 @@ def aclcheck():
 
 def userLog(usr, usrmsg, chnl, srv, usr_id, chnl_id, srv_id):
     if os.path.exists(f'{maindir}/ACL/{usr_id}/message.txt') == True:
-        usrmessage = open(f'{maindir}/ACL/{usr_id}/message.txt', 'a')
+        usrmessage = open(f'{maindir}/ACL/{usr_id}/message.txt', 'a', encoding='utf-8')
         usrmessage.write(f'[{srv}({srv_id}) / {chnl}({chnl_id})] {usr}({usr_id}): {usrmsg}\n')
         usrmessage.close()
     else:
         print("[ACL] New user detected. Creating new entry...")
         os.makedirs(f'{maindir}/ACL/{usr_id}')
-        usrmessage = open(f'{maindir}/ACL/{usr_id}/message.txt', 'a')
+        usrmessage = open(f'{maindir}/ACL/{usr_id}/message.txt', 'a', encoding='utf-8')
         usrmessage.write(f'[{srv}({srv_id}) / {chnl}({chnl_id})] {usr}({usr_id}): {usrmsg}\n')
         usrmessage.close()
 
@@ -72,13 +72,13 @@ def userLog(usr, usrmsg, chnl, srv, usr_id, chnl_id, srv_id):
 def channelLog(usr, usrmsg, chnl, srv, usr_id, chnl_id, srv_id):
     print(f"[Message//{srv}/{chnl}] {usr}: {usrmsg}")
     if os.path.exists(f'{maindir}/ACL/default/message.txt') == True:
-        usrmessage = open(f'{maindir}/ACL/default/message.txt', 'a')
+        usrmessage = open(f'{maindir}/ACL/default/message.txt', 'a', encoding='utf-8')
         usrmessage.write(f"[Message//{srv}/{chnl}] {usr}: {usrmsg}\n")
         usrmessage.close()
     else:
         print("[ACL] Default message history not detected. Creating new entry...")
         os.makedirs(f'{maindir}/ACL/default')
-        usrmessage = open(f'{maindir}/ACL/default/message.txt', 'a')
+        usrmessage = open(f'{maindir}/ACL/default/message.txt', 'a', encoding='utf-8')
         usrmessage.write(f"[Message//{srv}/{chnl}] {usr}: {usrmsg}\n")
         usrmessage.close()
 
@@ -96,7 +96,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 status = [' ', f'{platform.system()} {platform.release()}']
 choice = random.choice(status)
-client = commands.Bot(command_prefix='!', intents=intents, activity=discord.Game(name=choice))
+client = commands.Bot(command_prefix='.', intents=intents, activity=discord.Game(name=choice))
 
 
 try:
@@ -252,9 +252,8 @@ async def newest_update(ctx):
     await ctx.send(f"""
 [ACL v{ver}]
     Changelog:
-- Bot saves every message to directories named as User ID who just send something
-- New command: .ACL [getusr/get history]
-- Updated printed date format in Logs.txt
+- Fixed an encoding issue that caused an error on Windows systems.
+- changed default prefix to .
 
 To see older releases, find 'updates.txt' in folder 'Files'
 """)
