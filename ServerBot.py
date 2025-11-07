@@ -1,7 +1,7 @@
 import subprocess
 import os
 
-ver = "2.1"
+ver = "2.2"
 mainver = "1.7"
 
 def os_selector():
@@ -252,8 +252,7 @@ async def newest_update(ctx):
     await ctx.send(f"""
 [ACL v{ver}]
     Changelog:
-- Fixed an encoding issue that caused an error on Windows systems.
-- changed default prefix to .
+- Minor fixes
 
 To see older releases, find 'updates.txt' in folder 'Files'
 """)
@@ -536,9 +535,9 @@ async def ACL(ctx, mode, *, value):
             await ctx.send('Wrong mode.')
     else:
         await ctx.send(ACLnopermission)
-        print(f"Information[ACL]: User {ctx.message.author.id} tried to use !ACL command without permission.\nSee {maindir}/ACL/{ctx.message.author.id} for more information.\n")
+        print(f"Information[ACL]: User {ctx.message.author.id} tried to use .ACL command without permission.\nSee {maindir}/ACL/{ctx.message.author.id} for more information.\n")
         logs = open(f'{maindir}/Logs.txt', 'a')
-        logs.write(f"Information[ACL]: User {ctx.message.author.id} tried to use !ACL command without permission.\nSee {maindir}/ACL/{ctx.message.author.id} for more information.\n")
+        logs.write(f"Information[ACL]: User {ctx.message.author.id} tried to use .ACL command without permission.\nSee {maindir}/ACL/{ctx.message.author.id} for more information.\n")
         logs.close()
         #ACL-END
 
