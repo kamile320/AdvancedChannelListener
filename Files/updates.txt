@@ -14,3 +14,8 @@
     Changelog:
 - Fixed an encoding issue that caused an error on Windows systems.
 - changed default prefix to .
+
+
+[ACL v2.2]
+    Changelog:
+- Minor fixes
