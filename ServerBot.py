@@ -3,7 +3,7 @@ import os
 
 ver = "2.2"
 mainver = "1.7"
-extendedErrMess = True
+extendedErrMess = False
 
 def os_selector():
     print(f"====ServerBot v{ver} Recovery Menu====")
@@ -804,4 +804,5 @@ async def addbot(ctx, version):
 try:
     client.run(os.getenv('TOKEN'))
 except:
+
     print("Can't load Bot Token!\nEnter valid Token in '.env' file!")
