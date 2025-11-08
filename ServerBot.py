@@ -3,6 +3,7 @@ import os
 
 ver = "2.2"
 mainver = "1.7"
+extendedErrMess = True
 
 def os_selector():
     print(f"====ServerBot v{ver} Recovery Menu====")
@@ -137,9 +138,12 @@ sctlerr = "Something went wrong.\n'sctl' directory with service entries exists?"
 sctlmade = "Created 'sctl' directory for systemctl service entry."
 badsite = "Something went wrong.\nHave you typed the correct address?\n..Or maybe the website just doesn't exist? "
 
-ACLnotfounderr = "User history not found."
-ACLhistorynotfound = "Default message history does not exist."
-ACLnopermission = "You don't have permission to use ACL mode. This incident will be reported."
+ACL_notfounderr = "User history not found."
+ACL_historynotfound = "Default message history does not exist."
+ACL_nopermission = "You don't have permission to use ACL mode. This incident will be reported."
+ACL_rm_all_success = "Cleared all saved message history."
+ACL_rm_all_fail = "Can't clear all message history."
+ACL_rm_user_fail = "Can't clear message history of the selected user. Does it even exist?"
 
 #ClientEvent
 @client.event
@@ -252,7 +256,9 @@ async def newest_update(ctx):
     await ctx.send(f"""
 [ACL v{ver}]
     Changelog:
-- Minor fixes
+- Updated .ACL command - now you can remove all 
+  saved messages or only messages of selected user
+- Small code fixes/improvements
 
 To see older releases, find 'updates.txt' in folder 'Files'
 """)
@@ -518,26 +524,67 @@ async def pingip(ctx, ip):
 
         #ACL
 #1
-@client.command(name='ACL', help='Manage A.C.L. users messages saved history\ngetusr - shows User history by User ID\nget history - history of all saved messages')
+@client.command(name='ACL', help='Manage A.C.L. users messages saved history\ngetusr - shows User history by User ID\nget history - history of all saved messages\nclear [all/user_id] - removes all saved messages or only messages of selected user')
 async def ACL(ctx, mode, *, value):
     if str(ctx.message.author.id) in admin_usr:
         if mode == 'getusr':
             try:
                 await ctx.send(file=discord.File(f'{maindir}/ACL/{value}/message.txt'))
             except:
-                await ctx.send(ACLnotfounderr)
+                await ctx.send(ACL_notfounderr)
         elif mode == 'get' and value == 'history':
             try:
                 await ctx.send(file=discord.File(f'{maindir}/ACL/default/message.txt'))
             except:
-                await ctx.send(ACLhistorynotfound)
+                await ctx.send(ACL_historynotfound)
+        elif mode == 'clear':
+            if value == 'all':
+                try:
+                    shutil.rmtree(f'{maindir}/ACL/')
+                    await ctx.send(ACL_rm_all_success)
+
+                    message = f"Information[ACL]: {ACL_rm_all_success} Command executed by: {ctx.author.id}\n"
+                    print(message)
+                    log = open(f'{maindir}/Logs.txt', 'a')
+                    log.write(message)
+                    log.close()
+                except Exception as exc:
+                    if extendedErrMess:
+                        await ctx.send(f"{ACL_rm_all_fail} \nException: {exc}")
+                    else:
+                        await ctx.send(ACL_rm_all_fail)
+                    
+                    message = f"Information[ACL]: User {ctx.message.author.id} tried to clear all message history but failed. \nException: \n{exc}\n"
+                    print(message)
+                    log = open(f'{maindir}/Logs.txt', 'a')
+                    log.write(message)
+                    log.close()
+            else:
+                try:
+                    shutil.rmtree(f'{maindir}/ACL/{value}')
+                    await ctx.send(f"Cleared message history of <@{value}>.")
+                    log = open(f'{maindir}/Logs.txt', 'a')
+                    log.write(f"Information[ACL]: User {ctx.message.author.id} cleared message history of {value}.\n")
+                    log.close()
+                except Exception as exc:
+                    if extendedErrMess:
+                        await ctx.send(f"{ACL_rm_user_fail} \nException: {exc}")
+                    else:
+                        await ctx.send(ACL_rm_user_fail)
+                    
+                    message = f"Information[ACL]: User {ctx.message.author.id} tried to clear message history of {value} but failed. \nException: \n{exc}\n"
+                    print(message)
+                    log = open(f'{maindir}/Logs.txt', 'a')
+                    log.write(message)
+                    log.close()
         else:
-            await ctx.send('Wrong mode.')
+            await ctx.send("Wrong mode. See '.help ACL' for more info")
     else:
-        await ctx.send(ACLnopermission)
-        print(f"Information[ACL]: User {ctx.message.author.id} tried to use .ACL command without permission.\nSee {maindir}/ACL/{ctx.message.author.id} for more information.\n")
+        await ctx.send(ACL_nopermission)
+        message = f"Information[ACL]: User {ctx.message.author.id} tried to use .ACL command without permission.\nSee {maindir}/ACL/{ctx.message.author.id} for more information.\n"
+        print(message)
         logs = open(f'{maindir}/Logs.txt', 'a')
-        logs.write(f"Information[ACL]: User {ctx.message.author.id} tried to use .ACL command without permission.\nSee {maindir}/ACL/{ctx.message.author.id} for more information.\n")
+        logs.write(message)
         logs.close()
         #ACL-END
 
