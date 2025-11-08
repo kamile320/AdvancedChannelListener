@@ -18,4 +18,6 @@
 
 [ACL v2.2]
     Changelog:
-- Minor fixes
+- Updated .ACL command - now you can remove all 
+  saved messages or only messages of selected user
+- Small code fixes/improvements
