@@ -21,3 +21,8 @@
 - Updated .ACL command - now you can remove all 
   saved messages or only messages of selected user
 - Small code fixes/improvements
+
+
+[ACL v3.0]
+    Changelog:
+- Updated ACL base to ServerBot v1.9.3
