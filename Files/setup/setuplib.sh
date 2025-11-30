@@ -19,7 +19,6 @@ pip3 install datetime
 pip3 install psutil
 pip3 install asyncio
 pip3 install python-dotenv
-pip3 install requests
 pip3 install pyfiglet
 
 echo "'Externally managed' error? Run 'mkvenv.sh' script from 'Files/setup' directory to easily create one."
