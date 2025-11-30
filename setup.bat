@@ -11,7 +11,6 @@ pip install datetime
 pip install psutil
 pip install asyncio
 pip install python-dotenv
-pip install requests
 
 @echo Done.
 
