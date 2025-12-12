@@ -1,7 +1,7 @@
 import subprocess
 import os
 
-ver = "3.0"
+ver = "3.1"
 mainver = "1.9.3"
 displayname='A.C.L.'
 extendedErrMess = False
@@ -143,29 +143,32 @@ def aclcheck():
 
 #MessageLogging
 def userLog(usr, usrmsg, chnl, srv, usr_id, chnl_id, srv_id):
+    time = datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S')
     if os.path.exists(f'{maindir}/ACL/{usr_id}/message.txt') == True:
         usrmessage = open(f'{maindir}/ACL/{usr_id}/message.txt', 'a', encoding='utf-8')
-        usrmessage.write(f'[{srv}({srv_id}) / {chnl}({chnl_id})] {usr}({usr_id}): {usrmsg}\n')
+        usrmessage.write(f'[{time}] [{srv}({srv_id}) / {chnl}({chnl_id})] {usr}: {usrmsg}\n')
         usrmessage.close()
     else:
         print("[ACL] New user detected. Creating new entry...")
         os.makedirs(f'{maindir}/ACL/{usr_id}')
         usrmessage = open(f'{maindir}/ACL/{usr_id}/message.txt', 'a', encoding='utf-8')
-        usrmessage.write(f'[{srv}({srv_id}) / {chnl}({chnl_id})] {usr}({usr_id}): {usrmsg}\n')
+        usrmessage.write(f'{displayname} user message log\nUsername: {usr}\nUserID: {usr_id}\n##############################\n\n')
+        usrmessage.write(f'[{time}] [{srv}({srv_id}) / {chnl}({chnl_id})] {usr}: {usrmsg}\n')
         usrmessage.close()
 
 
 def channelLog(usr, usrmsg, chnl, srv, usr_id, chnl_id, srv_id):
-    print(f"[Message//{srv}/{chnl}] {usr}: {usrmsg}")
+    time = datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S')
+    print(f"[{time}] [Message//{srv}/{chnl}] {usr}: {usrmsg}")
     if os.path.exists(f'{maindir}/ACL/default/message.txt') == True:
         usrmessage = open(f'{maindir}/ACL/default/message.txt', 'a', encoding='utf-8')
-        usrmessage.write(f"[Message//{srv}/{chnl}] {usr}: {usrmsg}\n")
+        usrmessage.write(f"[{time}] [Message//{srv}/{chnl}] {usr}: {usrmsg}\n")
         usrmessage.close()
     else:
         print("[ACL] Default message history not detected. Creating new entry...")
         os.makedirs(f'{maindir}/ACL/default')
         usrmessage = open(f'{maindir}/ACL/default/message.txt', 'a', encoding='utf-8')
-        usrmessage.write(f"[Message//{srv}/{chnl}] {usr}: {usrmsg}\n")
+        usrmessage.write(f"[{time}] [Message//{srv}/{chnl}] {usr}: {usrmsg}\n")
         usrmessage.close()
 
 
@@ -266,7 +269,8 @@ async def newest_update(ctx):
     await ctx.send(f"""
 [ACL v{ver}]
     Changelog:
-- Updated ACL base to ServerBot v1.9.3
+- Updated .ACL command logging system
+- Improved message logging format
 
 To see older releases, find 'updates.txt' in 'Files' directory.
 """)
@@ -674,46 +678,38 @@ async def ACL(ctx, mode, *, value):
                     shutil.rmtree(f'{maindir}/ACL/')
                     await ctx.send(ACL_rm_all_success)
                     message = f"Information[ACL]: {ACL_rm_all_success} Command executed by: {ctx.author.id}\n"
-                    print(message)
-                    log = open(f'{maindir}/Logs.txt', 'a')
-                    log.write(message)
-                    log.close()
+                    printMessage(message)
+                    logMessage(message)
                 except Exception as exc:
                     if extendedErrMess:
                         await ctx.send(f"{ACL_rm_all_fail} \nException: {exc}")
                     else:
                         await ctx.send(ACL_rm_all_fail)
                     message = f"Information[ACL]: User {ctx.message.author.id} tried to clear all message history but failed. \nException: \n{exc}\n"
-                    print(message)
-                    log = open(f'{maindir}/Logs.txt', 'a')
-                    log.write(message)
-                    log.close()
+                    printMessage(message)
+                    logMessage(message)
             else:
                 try:
                     shutil.rmtree(f'{maindir}/ACL/{value}')
                     await ctx.send(f"Cleared message history of <@{value}>.")
-                    log = open(f'{maindir}/Logs.txt', 'a')
-                    log.write(f"Information[ACL]: User {ctx.message.author.id} cleared message history of {value}.\n")
-                    log.close()
+                    message = f"Information[ACL]: User {ctx.message.author.id} cleared message history of {value}.\n"
+                    printMessage(message)
+                    logMessage(message)
                 except Exception as exc:
                     if extendedErrMess:
                         await ctx.send(f"{ACL_rm_user_fail} \nException: {exc}")
                     else:
                         await ctx.send(ACL_rm_user_fail)
                     message = f"Information[ACL]: User {ctx.message.author.id} tried to clear message history of {value} but failed. \nException: \n{exc}\n"
-                    print(message)
-                    log = open(f'{maindir}/Logs.txt', 'a')
-                    log.write(message)
-                    log.close()
+                    printMessage(message)
+                    logMessage(message)
         else:
             await ctx.send("Wrong mode. See '.help ACL' for more info")
     else:
         await ctx.send(ACL_nopermission)
         message = f"Information[ACL]: User {ctx.message.author.id} tried to use .ACL command without permission.\nSee {maindir}/ACL/{ctx.message.author.id} for more information.\n"
-        print(message)
-        logs = open(f'{maindir}/Logs.txt', 'a')
-        logs.write(message)
-        logs.close()
+        printMessage(message)
+        logMessage(message)
         #AdvancedChannelListener-END
 
 
