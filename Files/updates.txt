@@ -26,3 +26,9 @@
 [ACL v3.0]
     Changelog:
 - Updated ACL base to ServerBot v1.9.3
+
+
+[ACL v3.1]
+    Changelog:
+- Updated .ACL command logging system
+- Improved message logging format
