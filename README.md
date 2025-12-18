@@ -3,7 +3,7 @@
 <a href="https://github.com/kamile320/AdvancedChannelListener/releases">![GitHub Release](https://img.shields.io/github/v/release/kamile320/AdvancedChannelListener)</a>
 <a href="https://github.com/kamile320/AdvancedChannelListener/blob/main/LICENSE">![GitHub License](https://img.shields.io/github/license/kamile320/AdvancedChannelListener)</a>
 <a href="">![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/kamile320/AdvancedChannelListener/total)</a>
-<a href="">![GitHub commits since latest release](https://img.shields.io/github/commits-since/kamile320/AdvancedChannelListener/latest)</a>
+<a href="https://github.com/kamile320/AdvancedChannelListener/commits/main/">![GitHub commits since latest release](https://img.shields.io/github/commits-since/kamile320/AdvancedChannelListener/latest)</a>
 
 Discord Bot that listens all possible channels on Discord - you'll see every message sent on channels where the Bot is.<br><br>
 
