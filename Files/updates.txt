@@ -32,3 +32,9 @@
     Changelog:
 - Updated .ACL command logging system
 - Improved message logging format
+
+
+[ACL v4.0]
+    Changelog:
+- Reworked to a cog module - now you need a bot that uses cogs to run it (like ServerBot).
+- Added .ACLinfo command to show info about the module.
