@@ -7,12 +7,12 @@
 
 Discord Bot cog module that listens all available for the bot channels on Discord - you'll see every message sent on channels where the Bot is.<br><br>
 
-A.C.L. saves every message sent on Discord server to files in directories named as ID of Discord User who jus sent a message - with info about Server, Channel (and ID's of course).  
+A.C.L. saves every message sent on Discord server to files in directories named as ID of Discord User who just sent a message - with info about Server, Channel (and ID's of course).  
 Bot also listens DM chats with him. Now you can know what is going on your Discord server and who's who. No more impersonating, hiding, etc.  
 Everything works and creates automatically. Only thing you need to do is loading this module to supported Discord Bot that uses cogs - like [ServerBot](https://github.com/kamile320/serverbot).  
 Basic functionality of admin privileges/security/etc that uses .env file works as the same as in **ServerBot** - you can read about that in [ServerBot Manual](https://kamile320.github.io/ServerBot/manualEN.html).
 
-**REMEBER** - Bot saves every message sent on Discord Servers - this can break users privacy; you're using this module at your own risk!  
+**REMEBER** - Bot/Module saves every message sent on Discord Servers - this can break users privacy; you're using ACL at your own risk!  
 
 I recommend you to put code below in your bot main file in your on_message async function - this will allow bot to use on_message functions from ACL module:
 ```
