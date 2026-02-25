@@ -23,12 +23,12 @@ class AdvancedChannelListener(commands.Cog):
 
         try:
             dotenv.load_dotenv()
-            ############# token/intents/etc ################
+            ################# Tokens/IDs/etc ###################
             self.admin_usr = os.getenv('admin_usr')
             self.extendedErrMess = os.getenv('extendedErrMess')
-            ################################################
+            ####################################################
         except:
-            print("CAN'T LOAD .env FILE!\nCreate .env file with the following variables:\nadmin_usr = ['your discordID']\nextendedErrMess = True/False")
+            print("[ACL] CAN'T LOAD .env FILE!\nCreate .env file with the variables below and reload module:\nadmin_usr = ['your Discord ID']\nextendedErrMess = True/False\nThe .env file should be located in the bot's main directory.")
         
         self.aclcheck()
 
