@@ -28,7 +28,7 @@ class AdvancedChannelListener(commands.Cog):
             self.extendedErrMess = os.getenv('extendedErrMess')
             ################################################
         except:
-            print("CAN'T LOAD .env FILE!\nCreate .env file using setup.sh")
+            print("CAN'T LOAD .env FILE!\nCreate .env file with the following variables:\nadmin_usr = ['your discordID']\nextendedErrMess = True/False")
         
         self.aclcheck()
 
