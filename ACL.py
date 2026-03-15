@@ -9,7 +9,7 @@ class AdvancedChannelListener(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        self.ACLver = "4.0"
+        self.ACLver = "4.1"
         self.displayname='A.C.L.'
         self.maindir = os.getcwd()
 
@@ -45,6 +45,7 @@ class AdvancedChannelListener(commands.Cog):
             except:
                 print('Cannot create ACL directory.')
 
+
     #MessageLogging
     def userLog(self, usr, usrmsg, chnl, srv, usr_id, chnl_id, srv_id):
         time = datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S')
@@ -73,6 +74,18 @@ class AdvancedChannelListener(commands.Cog):
             usrmessage = open(f'{self.maindir}/ACL/default/message.txt', 'a', encoding='utf-8')
             usrmessage.write(f"[{time}] [Message//{srv}/{chnl}] {usr}: {usrmsg}\n")
             usrmessage.close()
+
+
+    #LogMessage
+    def logMessage(self, info):
+        time = datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S')
+        logs = open(f'{self.maindir}/Logs.txt', 'a', encoding='utf-8')
+        logs.write(f'[{time}] {info}\n')
+        logs.close()
+    #PrintMessage
+    def printMessage(self, info):
+        time = datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S')
+        print(f'[{time}] {info}')
 
 
     async def on_message_hook(self,message):
@@ -177,7 +190,8 @@ This module saves every message sent in Discord channels. This can break user pr
 
 Changelog v{self.ACLver}:
 - Reworked to a cog module - now you need a bot that uses cogs to run it (like ServerBot).
-- Added .ACLinfo command to show info about the module.""")
+- Added .ACLinfo command to show info about the module.
+- Added missing definitions for message logging.""")
 
 async def setup(bot):
     await bot.add_cog(AdvancedChannelListener(bot))
