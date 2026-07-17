@@ -12,7 +12,7 @@ Bot also listens DM chats with him. Now you can know what is going on your Disco
 Everything works and creates automatically. Only thing you need to do is loading this module to supported Discord Bot that uses cogs - like [ServerBot](https://github.com/kamile320/serverbot).  
 Basic functionality of admin privileges/security/etc that uses .env file works the same as in **ServerBot** - you can read about that in [ServerBot Manual](https://kamile320.github.io/ServerBot/manualEN.html).
 
-**REMEBER** - Bot/Module saves every message sent on Discord Servers - this can break users privacy; you're using ACL at your own risk!  
+**REMEMBER** - Bot/Module saves every message sent on Discord Servers - this can break users privacy; you're using ACL at your own risk!  
 
 I recommend you to put code below in your bot main file in your on_message async function - this will allow bot to use on_message functions from ACL module:
 ```
