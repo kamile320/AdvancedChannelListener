@@ -43,3 +43,16 @@
 [ACL v4.1]
     Changelog:
 - Added missing definitions for message logging.
+
+
+[ACL v5.0]
+    Changelog:
+- Added more advanced logging system - now ACL logs users, server and channels separately.
+- Added more message variables.
+- Added untrackableUser variable in the .env file - type there any type of ID 
+  and this user/server/channel will have an immunity from logging.
+- Global message log (also known as default message log) is now disabled by default.
+  You can turn it on in the .env file (globalLog = True/False)
+- Updated .ACL command - now you can get user/server/channel history by entering ID and also remove it.
+- Better error handling.
+- Updated maindir variable - now module will save log in the same directory as ACL.py
