@@ -86,7 +86,7 @@ class AdvancedChannelListener(commands.Cog):
 
     #MessageLogging
     def userLog(self, usr, usrmsg, chnl, srv, usr_id, chnl_id, srv_id):
-        if str(usr_id) in self.untrackableUsr or str(srv_id) in self.untrackableUsr or str(chnl_id) in self.untrackableUsr:
+        if str(srv_id) in self.untrackableUsr or str(chnl_id) in self.untrackableUsr or str(usr_id) in self.untrackableUsr:
             return
         time = self.time()
         if os.path.exists(f'{self.maindir}/ACL/User/{usr_id}/message.txt') == True:
@@ -117,7 +117,7 @@ class AdvancedChannelListener(commands.Cog):
 
 
     def globalLog(self, usr, usrmsg, chnl, srv, usr_id, chnl_id, srv_id):
-        if str(usr_id) in self.untrackableUsr or str(srv_id) in self.untrackableUsr or str(chnl_id) in self.untrackableUsr:
+        if str(srv_id) in self.untrackableUsr or str(chnl_id) in self.untrackableUsr or str(usr_id) in self.untrackableUsr:
             return
         time = self.time()
         if os.path.exists(f'{self.maindir}/ACL/global.txt') == True:
@@ -146,7 +146,7 @@ class AdvancedChannelListener(commands.Cog):
 
 
     def serverLog(self, usr, usrmsg, chnl, srv, usr_id, chnl_id, srv_id):
-        if str(usr_id) in self.untrackableUsr or str(srv_id) in self.untrackableUsr or str(chnl_id) in self.untrackableUsr:
+        if str(srv_id) in self.untrackableUsr or str(chnl_id) in self.untrackableUsr or str(usr_id) in self.untrackableUsr:
             return
         time = self.time()
         message = f'[{time}] [{srv} / {chnl}] {usr}({usr_id}): {usrmsg}\n'
@@ -164,7 +164,7 @@ class AdvancedChannelListener(commands.Cog):
                     print(f'{self.ACL_message_write_fail}')
 
         else:
-            print("[ACL] New Server detected. Creating new entry...")
+            print("[ACL] New server detected. Creating new entry...")
             try: 
                 os.makedirs(f'{self.maindir}/ACL/Server/{srv_id}')
 
@@ -192,7 +192,7 @@ class AdvancedChannelListener(commands.Cog):
                     print(f'{self.ACL_message_write_fail}')
 
         else:
-            print("[ACL] New Channel detected. Creating new entry...")
+            print("[ACL] New channel detected. Creating new entry...")
             try: 
                 usrmessage = open(f'{self.maindir}/ACL/Server/{srv_id}/{chnl_id}.txt', 'a', encoding='utf-8')
                 usrmessage.write(f'{self.displayname} channel message log\nChannel name: {chnl}\nChannelID: {chnl_id}\nIn Guild: {srv}({srv_id})\nDetected: {time}\n##############################\n\n')
@@ -258,209 +258,211 @@ class AdvancedChannelListener(commands.Cog):
     #1
     @commands.command(name='ACL', help='Manage A.C.L. users messages saved history\nget user {ID} - shows User history by User ID\nget history - (global) history of all saved messages\nclear all/user/server/channel/global - removes selected type of saved messages; type additionally ID when user/server/channel selected')
     async def ACL(self, ctx, mode=None, value=None, value2=None):
-        if str(ctx.message.author.id) in self.admin_usr:
-            if mode is None:
-                await ctx.send(self.ACL_incomplete_command)
+        if str(ctx.message.author.id) not in self.admin_usr:
+            await ctx.send(self.ACL_nopermission)
+            message = f"Information[ACL]: User {ctx.message.author.id} tried to use .ACL command without permission.\nSee {self.maindir}/ACL/Users/{ctx.message.author.id} for more information.\n"
+            self.printMessage(message)
+            self.logMessage(message)
+            return
+
+        if mode is None:
+            await ctx.send(self.ACL_incomplete_command)
+            return
+
+        if mode == 'get':
+            if value == 'user':#    Get complete user message history of selected user
+                if value2 is None:
+                    await ctx.send(self.ACL_no_value_ID)
+                    return
+
+                try:
+                    await ctx.send(file=discord.File(f'{self.maindir}/ACL/User/{value2}/message.txt'))
+                except Exception as err:
+                    if self.extendedErrMess in self.accept_value:
+                        await ctx.send(f"{self.ACL_user_not_found}\n{err}")
+                    else:
+                        await ctx.send(self.ACL_user_not_found)
                 return
 
-            if mode == 'get':
-                if value == 'user':
-                    if value2 is None:
-                        await ctx.send(self.ACL_no_value_ID)
-                        return
 
-                    try:
-                        await ctx.send(file=discord.File(f'{self.maindir}/ACL/User/{value2}/message.txt'))
-                    except Exception as err:
-                        if self.extendedErrMess in self.accept_value:
-                            await ctx.send(f"{self.ACL_user_not_found}\n{err}")
-                        else:
-                            await ctx.send(self.ACL_user_not_found)
+            elif value == 'server':#    Get complete user message history from selected server
+                if value2 is None:
+                    await ctx.send(self.ACL_no_value_ID)
                     return
 
+                try:
+                    await ctx.send(file=discord.File(f'{self.maindir}/ACL/Server/{value2}/serverlog.txt'))
+                except Exception as err:
+                    if self.extendedErrMess in self.accept_value:
+                        await ctx.send(f"{self.ACL_server_not_found}\n{err}")
+                    else:
+                        await ctx.send(self.ACL_server_not_found)
+                return
 
-                elif value == 'server':#    Get complete user message history from selected server
-                    if value2 is None:
-                        await ctx.send(self.ACL_no_value_ID)
-                        return
 
-                    try:
-                        await ctx.send(file=discord.File(f'{self.maindir}/ACL/Server/{value2}/serverlog.txt'))
-                    except Exception as err:
-                        if self.extendedErrMess in self.accept_value:
-                            await ctx.send(f"{self.ACL_server_not_found}\n{err}")
-                        else:
-                            await ctx.send(self.ACL_server_not_found)
+            elif value == 'channel':#   Get complete user message history from selected channel
+                if value2 is None:
+                    await ctx.send(self.ACL_no_value_ID)
                     return
 
+                try:
+                    server_id = ctx.bot.get_channel(int(value2)).guild.id
+                except AttributeError:
+                    server_id = "DM"
 
-                elif value == 'channel':#   Get complete user message history from selected channel
-                    if value2 is None:
-                        await ctx.send(self.ACL_no_value_ID)
-                        return
+                try:
+                    await ctx.send(file=discord.File(f'{self.maindir}/ACL/Server/{server_id}/{value2}.txt'))
+                except Exception as err:
+                    if self.extendedErrMess in self.accept_value:
+                        await ctx.send(f"{self.ACL_channel_not_found}\n{err}")
+                    else:
+                        await ctx.send(self.ACL_channel_not_found)
+                return
 
-                    try:
-                        server_id = ctx.bot.get_channel(int(value2)).guild.id
-                    except AttributeError:
-                        server_id = "DM"
 
-                    try:
-                        await ctx.send(file=discord.File(f'{self.maindir}/ACL/Server/{server_id}/{value2}.txt'))
-                    except Exception as err:
-                        if self.extendedErrMess in self.accept_value:
-                            await ctx.send(f"{self.ACL_channel_not_found}\n{err}")
-                        else:
-                            await ctx.send(self.ACL_channel_not_found)
+            elif value == 'history':#   Get complete user message history
+                if self.global_Log not in self.accept_value:
+                    await ctx.send(self.ACL_global_log_disabled)
                     return
 
+                try:
+                    await ctx.send(file=discord.File(f'{self.maindir}/ACL/global.txt'))
+                except:
+                    await ctx.send(self.ACL_history_not_found)
+                return
 
-                elif value == 'history':#   Get complete user message history
-                    if self.global_Log not in self.accept_value:
-                        await ctx.send(self.ACL_global_log_disabled)
-                        return
 
-                    try:
-                        await ctx.send(file=discord.File(f'{self.maindir}/ACL/global.txt'))
-                    except:
-                        await ctx.send(self.ACL_history_not_found)
+            else:
+                await ctx.send(self.ACL_wrong_mode)
+
+
+
+        elif mode == 'clear':
+            if value == 'all':#   Remove all records
+                await ctx.send(self.ACL_rm_all_pending)
+                try:
+                    shutil.rmtree(f'{self.maindir}/ACL/')
+                    await ctx.send(self.ACL_rm_all_success)
+                    message = f"Information[ACL]: {self.ACL_rm_all_success}\nCommand executed by: {ctx.author.id}\n"
+                    self.printMessage(message)
+                    self.logMessage(message)
+                except Exception as exc:
+                    if self.extendedErrMess in self.accept_value:
+                        await ctx.send(f"{self.ACL_rm_all_fail}\nException: {exc}")
+                    else:
+                        await ctx.send(self.ACL_rm_all_fail)
+                    message = f"Information[ACL]: User {ctx.message.author.id} tried to clear all message history but failed. \nException: {exc}\n"
+                    self.printMessage(message)
+                    self.logMessage(message)
+                return
+
+
+            elif value == 'user':#   Remove user records (from /ACL/User)
+                if value2 is None:
+                    await ctx.send(self.ACL_no_value_ID)
                     return
 
+                await ctx.send(self.ACL_rm_user_pending)
+                try:
+                    shutil.rmtree(f'{self.maindir}/ACL/User/{value2}')
+                    await ctx.send(f"Cleared message history of <@{value2}>.")
+                    message = f"Information[ACL]: User {ctx.message.author.id} cleared message history of {value2}.\n"
+                    self.printMessage(message)
+                    self.logMessage(message)
+                except Exception as exc:
+                    if self.extendedErrMess in self.accept_value:
+                        await ctx.send(f"{self.ACL_rm_user_fail} \nException: {exc}")
+                    else:
+                        await ctx.send(self.ACL_rm_user_fail)
+                    message = f"Information[ACL]: User {ctx.message.author.id} tried to clear message history of {value2} but failed. \nException: {exc}\n"
+                    self.printMessage(message)
+                    self.logMessage(message)
+                return
 
-                else:
-                    await ctx.send(self.ACL_wrong_mode)
 
-
-
-            elif mode == 'clear':
-                if value == 'all':
-                    await ctx.send(self.ACL_rm_all_pending)
-                    try:
-                        shutil.rmtree(f'{self.maindir}/ACL/')
-                        await ctx.send(self.ACL_rm_all_success)
-                        message = f"Information[ACL]: {self.ACL_rm_all_success}\nCommand executed by: {ctx.author.id}\n"
-                        self.printMessage(message)
-                        self.logMessage(message)
-                    except Exception as exc:
-                        if self.extendedErrMess in self.accept_value:
-                            await ctx.send(f"{self.ACL_rm_all_fail}\nException: {exc}")
-                        else:
-                            await ctx.send(self.ACL_rm_all_fail)
-                        message = f"Information[ACL]: User {ctx.message.author.id} tried to clear all message history but failed. \nException: {exc}\n"
-                        self.printMessage(message)
-                        self.logMessage(message)
+            elif value == 'server':#   Remove server records (with separate records of channels)
+                if value2 is None:
+                    await ctx.send(self.ACL_no_value_ID)
                     return
 
+                await ctx.send(self.ACL_rm_server_pending)
+                try:
+                    shutil.rmtree(f'{self.maindir}/ACL/Server/{value2}')
+                    await ctx.send(f"Cleared message history of ServerID({value2}).")
+                    message = f"Information[ACL]: User {ctx.message.author.id} cleared message history of ServerID({value2}).\n"
+                    self.printMessage(message)
+                    self.logMessage(message)
+                except Exception as exc:
+                    if self.extendedErrMess in self.accept_value:
+                        await ctx.send(f"{self.ACL_rm_server_fail} \nException: {exc}")
+                    else:
+                        await ctx.send(self.ACL_rm_server_fail)
+                    message = f"Information[ACL]: User {ctx.message.author.id} tried to clear message history of ServerID({value2}) but failed. \nException: {exc}\n"
+                    self.printMessage(message)
+                    self.logMessage(message)
+                return
 
-                elif value == 'user':
-                    if value2 is None:
-                        await ctx.send(self.ACL_no_value_ID)
-                        return
 
-                    await ctx.send(self.ACL_rm_user_pending)
-                    try:
-                        shutil.rmtree(f'{self.maindir}/ACL/User/{value2}')
-                        await ctx.send(f"Cleared message history of <@{value2}>.")
-                        message = f"Information[ACL]: User {ctx.message.author.id} cleared message history of {value2}.\n"
-                        self.printMessage(message)
-                        self.logMessage(message)
-                    except Exception as exc:
-                        if self.extendedErrMess:
-                            await ctx.send(f"{self.ACL_rm_user_fail} \nException: {exc}")
-                        else:
-                            await ctx.send(self.ACL_rm_user_fail)
-                        message = f"Information[ACL]: User {ctx.message.author.id} tried to clear message history of {value2} but failed. \nException: {exc}\n"
-                        self.printMessage(message)
-                        self.logMessage(message)
+            elif value == 'channel':#   Remove channel records
+                if value2 is None:
+                    await ctx.send(self.ACL_no_value_ID)
                     return
 
+                await ctx.send(self.ACL_rm_channel_pending)
 
-                elif value == 'server':
-                    if value2 is None:
-                        await ctx.send(self.ACL_no_value_ID)
-                        return
+                try:
+                    server_id = ctx.bot.get_channel(int(value2)).guild.id
+                except AttributeError:
+                    server_id = "DM"
 
-                    await ctx.send(self.ACL_rm_server_pending)
-                    try:
-                        shutil.rmtree(f'{self.maindir}/ACL/Server/{value2}')
-                        await ctx.send(f"Cleared message history of ServerID({value2}).")
-                        message = f"Information[ACL]: User {ctx.message.author.id} cleared message history of ServerID({value2}).\n"
-                        self.printMessage(message)
-                        self.logMessage(message)
-                    except Exception as exc:
-                        if self.extendedErrMess:
-                            await ctx.send(f"{self.ACL_rm_server_fail} \nException: {exc}")
-                        else:
-                            await ctx.send(self.ACL_rm_server_fail)
-                        message = f"Information[ACL]: User {ctx.message.author.id} tried to clear message history of ServerID({value2}) but failed. \nException: {exc}\n"
-                        self.printMessage(message)
-                        self.logMessage(message)
-                    return
+                try:
+                    os.remove(f'{self.maindir}/ACL/Server/{server_id}/{value2}.txt')
+                    await ctx.send(f"Cleared message history of ChannelID({value2}).")
+                    message = f"Information[ACL]: User {ctx.message.author.id} cleared message history of ChannelID({value2}).\n"
+                    self.printMessage(message)
+                    self.logMessage(message)
+                except Exception as exc:
+                    if self.extendedErrMess in self.accept_value:
+                        await ctx.send(f"{self.ACL_rm_channel_fail} \nException: {exc}")
+                    else:
+                        await ctx.send(self.ACL_rm_channel_fail)
+                    message = f"Information[ACL]: User {ctx.message.author.id} tried to clear message history of ChannelID({value2}) but failed. \nException: {exc}\n"
+                    self.printMessage(message)
+                    self.logMessage(message)
+                return
                 
 
-                elif value == 'channel':
-                    if value2 is None:
-                        await ctx.send(self.ACL_no_value_ID)
-                        return
-
-                    await ctx.send(self.ACL_rm_channel_pending)
-
-                    try:
-                        server_id = ctx.bot.get_channel(int(value2)).guild.id
-                    except AttributeError:
-                        server_id = "DM"
-
-                    try:
-                        os.remove(f'{self.maindir}/ACL/Server/{server_id}/{value2}.txt')
-                        await ctx.send(f"Cleared message history of ChannelID({value2}).")
-                        message = f"Information[ACL]: User {ctx.message.author.id} cleared message history of ChannelID({value2}).\n"
-                        self.printMessage(message)
-                        self.logMessage(message)
-                    except Exception as exc:
-                        if self.extendedErrMess:
-                            await ctx.send(f"{self.ACL_rm_channel_fail} \nException: {exc}")
-                        else:
-                            await ctx.send(self.ACL_rm_channel_fail)
-                        message = f"Information[ACL]: User {ctx.message.author.id} tried to clear message history of ChannelID({value2}) but failed. \nException: {exc}\n"
-                        self.printMessage(message)
-                        self.logMessage(message)
+            elif value == 'global':#   Remove global log
+                if self.global_Log not in self.accept_value:
+                    await ctx.send(self.ACL_global_log_disabled)
                     return
+
+                await ctx.send(self.ACL_rm_global_pending)
+                try:
+                    os.remove(f'{self.maindir}/ACL/global.txt')
+                    await ctx.send(self.ACL_rm_global_success)
+                    message = f"Information[ACL]: {self.ACL_rm_global_success}\nCommand executed by: {ctx.author.id}\n"
+                    self.printMessage(message)
+                    self.logMessage(message)
+                except Exception as exc:
+                    if self.extendedErrMess in self.accept_value:
+                        await ctx.send(f"{self.ACL_rm_global_fail}\nException: {exc}")
+                    else:
+                        await ctx.send(self.ACL_rm_global_fail)
+                    message = f"Information[ACL]: User {ctx.message.author.id} tried to remove global message history but failed. \nException: {exc}\n"
+                    self.printMessage(message)
+                    self.logMessage(message)
+                return
                 
 
-                elif value == 'global':
-                    if self.global_Log not in self.accept_value:
-                        await ctx.send(self.ACL_global_log_disabled)
-                        return
-
-                    await ctx.send(self.ACL_rm_global_pending)
-                    try:
-                        os.remove(f'{self.maindir}/ACL/global.txt')
-                        await ctx.send(self.ACL_rm_global_success)
-                        message = f"Information[ACL]: {self.ACL_rm_global_success}\nCommand executed by: {ctx.author.id}\n"
-                        self.printMessage(message)
-                        self.logMessage(message)
-                    except Exception as exc:
-                        if self.extendedErrMess in self.accept_value:
-                            await ctx.send(f"{self.ACL_rm_global_fail}\nException: {exc}")
-                        else:
-                            await ctx.send(self.ACL_rm_global_fail)
-                        message = f"Information[ACL]: User {ctx.message.author.id} tried to remove global message history but failed. \nException: {exc}\n"
-                        self.printMessage(message)
-                        self.logMessage(message)
-                    return
-                
-
-                else:
-                    await ctx.send(self.ACL_wrong_mode)
-                    return
             else:
                 await ctx.send(self.ACL_wrong_mode)
                 return
         else:
-            await ctx.send(self.ACL_nopermission)
-            message = f"Information[ACL]: User {ctx.message.author.id} tried to use .ACL command without permission.\nSee {self.maindir}/ACL/{ctx.message.author.id} for more information.\n"
-            self.printMessage(message)
-            self.logMessage(message)
-    
+            await ctx.send(self.ACL_wrong_mode)
+            return
+
+
     #2
     @commands.command(name='ACLinfo', help='Show info about loaded module')
     async def ACLinfo(self, ctx):
@@ -481,7 +483,8 @@ Changelog v{self.ACLver}:
   You can turn it on in the .env file (globalLog = True/False)
 - Updated .ACL command - now you can get user/server/channel history by entering ID and also remove it.
 - Better error handling.
-- Updated maindir variable - now module will save log in the same directory as ACL.py""")
+- Updated maindir variable - now module will save log in the same directory as ACL.py
+- Other small improvements and fixes""")
 
 async def setup(bot):
     await bot.add_cog(AdvancedChannelListener(bot))
