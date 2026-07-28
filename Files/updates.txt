@@ -54,5 +54,7 @@
 - Global message log (also known as default message log) is now disabled by default.
   You can turn it on in the .env file (globalLog = True/False)
 - Updated .ACL command - now you can get user/server/channel history by entering ID and also remove it.
+  Added 'update-env' option to add required variables to the '.env' file, and 'about' to see more information about the module.
 - Better error handling.
-- Updated maindir variable - now module will save log in the same directory as ACL.py
+- Updated maindir variable - now module will save the logs in the same directory as ACL.py
+- Other improvements and fixes
